@@ -51,7 +51,13 @@
                 $(".reset").click(function() {
                     $("table.canvas td").removeClass("drawn");
                 });
+                
+                var isLearning = false;
                 $(".learn").click(function() {
+                    if (isLearning) {
+                        return;
+                    }
+                    isLearning = true;
                     $(".learning").text("学習中。お待ちください");
                     $(".alert").fadeIn(1000, function() {
                         propagator.learn(patterns);
@@ -62,7 +68,9 @@
                         }
                         $(".learning").text(message);
                         
-                        $(".alert").delay(1000).fadeOut(500);
+                        $(".alert").delay(1000).fadeOut(500, function (){
+                            isLearning = false;
+                        });
                     });
 
                 });
