@@ -417,13 +417,14 @@ function Backpropagator(network) {
     this.neuronsDelta = {};
     this.synapsesDelta = {};
     this.ALLOWABLE_MARGIN_OF_ERROR = 0.08; // エラーの許容誤差
+    this.error;
 }
 Backpropagator.prototype.learn = function(patterns) {
     var error = this.ALLOWABLE_MARGIN_OF_ERROR + 1.0; // エラーの許容誤差より大きな値
 
     var howManyTimes = 0;
     // 学習エラーが許容誤差内になるまで繰り返す
-    while (error > this.ALLOWABLE_MARGIN_OF_ERROR) { // 一連の学習データを繰り返して学習する．
+    while (howManyTimes < 30 && error > this.ALLOWABLE_MARGIN_OF_ERROR) { // 一連の学習データを繰り返して学習する．
         for (var i = 0; i < patterns.length; i++) {
             var pattern = patterns[i];
             this.network.setInputs(pattern[0]);
@@ -444,6 +445,7 @@ Backpropagator.prototype.learn = function(patterns) {
             }
         }
         error *= 0.5;
+        this.error = error;
         howManyTimes++;
         if (this.reporter != null) {
             this.reporter.report(howManyTimes, this.network, patterns, error);
@@ -546,4 +548,7 @@ Backpropagator.prototype.SynapseDelta = function() {
 };
 Backpropagator.prototype.setReporter = function(reporter) {
     this.reporter = reporter;
+};
+Backpropagator.prototype.getError = function() {
+    return this.error;
 };
