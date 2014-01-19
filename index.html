@@ -1,1 +1,524 @@
-HelloWorld
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>DEMO:neuralnetwork.js</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <!-- Latest compiled and minified CSS -->
+                <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+        <!-- Optional theme -->
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+        <script type="text/javascript" src="https://rawgithub.com/tiny-studio/jquery-drawable-table/master/src/jquery.drawable-table.js" ></script>
+        <script type="text/javascript" src="src/neuralnetwork.js" ></script>
+        <script>
+            function toArray($table) {
+                var inputs = [];
+                $("td", $table).each(function(index, element) {
+                    var isDrawn = $(this).hasClass("drawn");
+                    inputs.push(isDrawn ? 1 : 0);
+                });
+                return inputs;
+            }
+            $(function() {
+                $("table.canvas").drawableTable();
+                var patterns = [];
+                var patternCount = $(".patterns table").size();
+                $(".patterns table").each(function(index, element) {
+                    var teachSignals = [];
+                    for (var i = 0; i < patternCount; i++) {
+                        if (i === index) {
+                            teachSignals.push(1);
+                        } else {
+                            teachSignals.push(0);
+                        }
+                    }
+                    patterns.push([toArray($(this)), teachSignals]);
+                });
+                var network = new HierarchalNeuralNetwork(100, 100, patternCount);
+                var propagator = new Backpropagator(network);
+                var Reporter = function() {
+                    this.report = function(howManyTimes, network, patterns, error) {
+                        console.log(howManyTimes + ":" + error);
+                    };
+                };
+                propagator.setReporter(new Reporter());
+
+                $(".reset").click(function() {
+                    $("table.canvas td").removeClass("drawn");
+                });
+                $(".learn").click(function() {
+                    $(".learning").text("学習中。お待ちください");
+                    $(".alert").fadeIn(1000, function() {
+                        propagator.learn(patterns);
+                        if (propagator.ALLOWABLE_MARGIN_OF_ERROR > propagator.getError()) {
+                            var message = "ばっちり覚えた！";
+                        } else {
+                            var message = "もう少し学習しないと不安。。。"
+                        }
+                        $(".learning").text(message);
+                        
+                        $(".alert").delay(1000).fadeOut(500);
+                    });
+
+                });
+                $(".run").click(function() {
+                    var inputs = toArray($("table.canvas"));
+                    network.setInputs(inputs);
+                    var outputs = network.getOutputs();
+                    var max = Math.max.apply(null, outputs);
+                    for (var i = 0; i < outputs.length; i++) {
+                        if (max === outputs[i]) {
+                            break;
+                        }
+                    }
+                    $(".result").html($(".patterns table caption").eq(i).text());
+                });
+            });
+        </script>
+        <style>
+            body {
+                margin-top: 50px;
+            }
+            table.canvas, .patterns table{
+                border-collapse: collapse;
+            }
+            .patterns div{
+                margin-left: 20px;
+            }
+            table.canvas td, .patterns td{
+                border: 1px solid #cccccc;
+            }
+            table.canvas td{
+                cursor: cell;
+                width: 20px;
+                height: 20px;
+            }
+            .patterns td{
+                width: 10px;
+                height: 10px;
+            }
+
+            .drawn{
+                background-color: #444444;
+            }
+
+            .result{
+                margin-left: 10px;
+                font-size:80px;
+            }
+            
+            .alert{
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">手書き文字認識サンドボックス</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                </div><!--/.nav-collapse -->
+            </div>
+        </div>
+
+        <div class="container">
+            <h1>手書き文字を判別します</h1>
+            <p>書かれた文字が、ページの下のリストに並んでいるパターンの中の、どれに一番近いかを判別します</p>
+            <div class="alert alert-info"><span class="learning">準備中</span></div>
+            <h3>ドラッグかクリックで文字が書けます</h3>
+            <table class="canvas">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+            <h4>操作</h4>
+            <p class="controls">
+                <button class="btn btn-info learn">学習させる</button>
+                <button class="btn btn-danger reset">書き直す</button>
+                <button class="btn btn-primary run">判別する</button>
+            </p>
+            <h2>結果:<span class="result"></span></h2>
+            <hr />
+            <h2>認識できるパターン</h2>
+            <div class="patterns">
+                <div class="pull-left">
+                    <table>
+                        <caption>2</caption>
+                        <tbody><tr>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                            </tr>
+                        </tbody></table>
+                </div>
+                <div class="pull-left">
+                    <table>
+                        <caption>A</caption>
+                        <tbody><tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="drawn"></td>
+                                <td></td>
+                            </tr>
+                        </tbody></table>
+                </div>
+
+            </div>
+        </div><!-- /.container -->
+
+
+    </body>
+</html>
