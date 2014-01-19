@@ -424,7 +424,7 @@ Backpropagator.prototype.learn = function(patterns) {
 
     var howManyTimes = 0;
     // 学習エラーが許容誤差内になるまで繰り返す
-    while (howManyTimes < 30 && error > this.ALLOWABLE_MARGIN_OF_ERROR) { // 一連の学習データを繰り返して学習する．
+    while (howManyTimes < 10 && error > this.ALLOWABLE_MARGIN_OF_ERROR) { // 一連の学習データを繰り返して学習する．
         for (var i = 0; i < patterns.length; i++) {
             var pattern = patterns[i];
             this.network.setInputs(pattern[0]);
