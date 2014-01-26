@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
         <!-- Latest compiled and minified CSS -->
-                <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
 
         <!-- Optional theme -->
 
@@ -49,11 +49,13 @@
                 propagator.setReporter(new Reporter());
 
                 $(".reset").click(function() {
+                    $(".result").html("");
                     $("table.canvas td").removeClass("drawn");
                 });
-                
+
                 var isLearning = false;
                 $(".learn").click(function() {
+                    $(".result").html("");
                     if (isLearning) {
                         return;
                     }
@@ -67,8 +69,8 @@
                             var message = "もう少し学習しないと不安。。。"
                         }
                         $(".learning").text(message);
-                        
-                        $(".alert").delay(1000).fadeOut(500, function (){
+
+                        $(".alert").delay(1000).fadeOut(500, function() {
                             isLearning = false;
                         });
                     });
@@ -95,6 +97,9 @@
             table.canvas, .patterns table{
                 border-collapse: collapse;
             }
+            table.canvas{
+                margin-right: 50px;
+            }
             .patterns div{
                 margin-left: 20px;
             }
@@ -103,8 +108,8 @@
             }
             table.canvas td{
                 cursor: cell;
-                width: 30px;
-                height: 30px;
+                width: 20px;
+                height: 20px;
             }
             .patterns td{
                 width: 10px;
@@ -119,7 +124,7 @@
                 margin-left: 10px;
                 font-size:80px;
             }
-            
+
             .alert{
                 display: none;
             }
