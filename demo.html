@@ -63,7 +63,7 @@
                     $(".learning").text("学習中。お待ちください");
                     $(".alert").fadeIn(1000, function() {
                         propagator.learn(patterns);
-                        if (propagator.ALLOWABLE_MARGIN_OF_ERROR > propagator.getError()) {
+                        if (propagator.allowableMarginOfError > propagator.getError()) {
                             var message = "ばっちり覚えた！";
                         } else {
                             var message = "もう少し学習しないと不安。。。"
