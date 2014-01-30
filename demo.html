@@ -65,6 +65,7 @@
                         propagator.learn(patterns);
                         if (propagator.allowableMarginOfError > propagator.getError()) {
                             var message = "ばっちり覚えた！";
+                            $('.learn').remove();
                         } else {
                             var message = "もう少し学習しないと不安。。。"
                         }
